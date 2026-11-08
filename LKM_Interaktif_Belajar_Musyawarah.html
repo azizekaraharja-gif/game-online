@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LKM Interaktif – Belajar Musyawarah</title>
+<style>
+:root{--ink:#2f5a4a;--dk:#31606f;--gr:#416b5a;--lt:#55b38a;--bg:#eefaff;--ok:#2e9e5b;--bad:#e0523f;--ac:#f4a21d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+body{margin:0;font-family:system-ui,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:clamp(18px,2.1vw,30px)}
+header{background:var(--dk);color:#fff;padding:.5em .8em;display:flex;flex-wrap:wrap;align-items:center;gap:.5em .8em}
+header h1{margin:0;font-size:1.15em;flex:1 1 14em}
+.tabs{display:flex;gap:.4em}
+.tab{min-width:2.4em;height:2.4em;border-radius:50%;border:3px solid #fff;background:transparent;color:#fff;font:inherit;font-weight:700}
+.tab.on{background:var(--ac);border-color:var(--ac);color:#222}
+.tab.done{background:var(--lt);border-color:var(--lt)}
+.pill{background:#fff;color:var(--dk);border-radius:2em;padding:.2em .8em;font-weight:700}
+main{padding:.8em 1em;max-width:1400px;margin:auto}
+h2{margin:.2em 0;color:var(--dk)} .sub{margin:.1em 0 .7em;opacity:.85}
+button.o,.chip,.card,.step{font:inherit;color:#fff;background:var(--gr);border:0;border-radius:.7em;padding:.7em 1em;min-height:2.6em;text-align:left;cursor:pointer;box-shadow:0 .15em 0 rgba(0,0,0,.25)}
+button.o{display:block;width:100%;margin:.5em 0}
+.q{font-size:1.2em;font-weight:700;background:#fff;border-radius:.7em;padding:.8em 1em;margin-bottom:.4em;border:3px solid var(--dk)}
+.ok{background:var(--ok)!important}.bad{background:var(--bad)!important;opacity:.6}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-.4em)}75%{transform:translateX(.4em)}}
+.pool{display:flex;flex-wrap:wrap;gap:.6em;margin:.4em 0 .8em;min-height:3em}
+.chip{background:var(--dk)}.chip.sel{background:var(--ac);color:#222;outline:4px solid #fff;box-shadow:0 0 0 7px var(--ac)}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(14em,1fr));gap:.7em}
+.bk{background:#fff;border:4px dashed var(--lt);border-radius:.9em;padding:.5em;min-height:6em;cursor:pointer}
+.bk b{display:block;text-align:center;color:var(--dk);margin-bottom:.3em}
+.bk .chip{display:block;background:var(--ok);margin:.3em 0;font-size:.85em;box-shadow:none;cursor:default}
+.cards{display:grid;gap:.6em}.card{background:var(--dk);display:flex;gap:.6em;align-items:center}
+.card i{font-style:normal;background:var(--ac);color:#222;border-radius:50%;min-width:1.8em;height:1.8em;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.step{display:block;width:100%;margin:.4em 0;background:#fff;color:var(--ink);border:3px solid var(--lt)}
+.step.on{border-color:var(--ac)}.step.fin{background:var(--ok);color:#fff;border-color:var(--ok)}.step.lock{opacity:.45}
+.go{background:var(--ac);color:#222;border:0;border-radius:2em;padding:.6em 1.4em;font:inherit;font-weight:700;margin-top:.6em;cursor:pointer}
+.end{background:#fff;border:4px solid var(--ok);border-radius:1em;padding:1em;margin-top:.8em;text-align:center}
+.end h3{margin:.1em;color:var(--ok);font-size:1.4em}
+.reset{margin-left:auto;background:transparent;color:#fff;border:2px solid #fff;border-radius:2em;font:inherit;padding:.2em .8em}
+</style>
+</head>
+<body>
+<header>
+  <h1>LKM Interaktif · Belajar Musyawarah</h1>
+  <div class="tabs" id="tabs"></div>
+  <span class="pill" id="sc">⭐ 0</span>
+  <button class="reset" onclick="location.reload()">Ulangi</button>
+</header>
+<main id="st"></main>
+<script>
+const $=s=>document.querySelector(s);
+const mix=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const shk=e=>{e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')};
+let stars=0,cur=0,done=[];
+const A=[
+{t:'Tebak Cepat',s:'Pengertian dan manfaat (Slide 4–5)',k:'quiz',qs:[
+ {q:'Musyawarah adalah …',o:['cara berdiskusi bersama untuk mencari solusi terbaik','keputusan yang dibuat satu orang saja','memilih pendapat yang suaranya paling keras'],a:0},
+ {q:'Musyawarah adalah pengamalan sila ke berapa Pancasila?',o:['Sila ke-1','Sila ke-4','Sila ke-5'],a:1},
+ {q:'Manakah yang BUKAN manfaat musyawarah?',o:['Mendapatkan keputusan yang adil','Menumbuhkan kebersamaan dan persatuan','Semua keinginan pribadi pasti dituruti','Membantu menyelesaikan masalah secara bijaksana'],a:2},
+ {q:'Dengan bermusyawarah, kita berlatih sikap …',o:['saling menghargai pendapat','menang sendiri','tidak peduli teman'],a:0}]},
+{t:'Pilah Contoh',s:'Sentuh contoh, lalu sentuh kotak yang tepat (Slide 6–8)',k:'sort',b:['🏠 Rumah','🏫 Sekolah','🏘️ Masyarakat'],it:[
+ ['Menentukan tujuan liburan keluarga',0],['Membagi tugas mencuci piring dan menyapu',0],['Memilih ketua kelas bersama',1],['Menentukan jadwal piket kelas',1],['Memilih ketua RT atau RW',2],['Rapat warga menjaga kebersihan lingkungan',2]]},
+{t:'Susun Langkah',s:'Sentuh kartu sesuai urutan yang benar (Slide 9)',k:'order',it:[
+ 'Menentukan masalah yang akan dibahas.','Mendengarkan pendapat dari semua peserta.','Menganalisis berbagai usulan untuk mencari solusi terbaik.','Mengambil keputusan bersama berdasarkan mufakat.']},
+{t:'Sikap Kita',s:'Sentuh sikap, lalu sentuh kotak yang tepat (Slide 10)',k:'sort',b:['👍 Sikap yang Baik','👎 Sikap Kurang Baik'],it:[
+ ['Berani berpendapat dengan sopan',0],['Mendengarkan teman yang sedang berbicara',0],['Mengutamakan kepentingan bersama',0],['Menerima keputusan dengan lapang dada',0],
+ ['Memotong pembicaraan teman',1],['Marah dan pergi karena usulannya tidak dipilih',1],['Memaksakan kehendak sendiri',1],['Menertawakan pendapat teman',1]]},
+{t:'Ayo Bermusyawarah!',s:'Praktik bersama kelompok',k:'sim',sc:'Kelas VI akan mengadakan Jumat Bersih. Kegiatan apa yang akan dipilih?',op:['Kerja bakti membersihkan halaman sekolah','Merawat taman kelas','Membersihkan perpustakaan'],
+ st:['Tentukan masalah: baca bersama, apa yang akan diputuskan?','Dengarkan pendapat: setiap anggota menyampaikan usulan secara bergantian.','Analisis usulan: bahas manfaat dan kerugian tiap usulan untuk kelas.','Ambil keputusan bersama berdasarkan mufakat.']}];
+
+function nav(){$('#tabs').innerHTML=A.map((a,i)=>`<button class="tab ${i==cur?'on':''} ${done[i]?'done':''}" onclick="go(${i})">${i+1}</button>`).join('');$('#sc').textContent='⭐ '+stars}
+function go(i){cur=i;nav();const a=A[i];$('#st').innerHTML=`<h2>Kegiatan ${i+1}: ${a.t}</h2><p class="sub">${a.s}</p><div id="box"></div>`;R[a.k](a,$('#box'))}
+function fin(msg){done[cur]=1;nav();const nx=cur<A.length-1;$('#box').insertAdjacentHTML('beforeend',`<div class="end"><h3>🎉 Hebat!</h3><p>${msg}</p>${nx?`<button class="go" onclick="go(${cur+1})">Kegiatan berikutnya ▶</button>`:'<p><b>Semua kegiatan selesai. Bacakan hasil kelompokmu di depan kelas!</b></p>'}</div>`);$('#box').lastChild.scrollIntoView({behavior:'smooth'})}
+const R={
+quiz(a,b){let n=0;(function show(){const q=a.qs[n];b.innerHTML=`<div class="q">Soal ${n+1}/${a.qs.length}<br>${q.q}</div>`+q.o.map((t,i)=>`<button class="o" data-i="${i}">${t}</button>`).join('');
+ b.querySelectorAll('.o').forEach(e=>e.onclick=()=>{if(+e.dataset.i==q.a){e.classList.add('ok');stars++;nav();b.querySelectorAll('.o').forEach(x=>x.onclick=null);setTimeout(()=>{n++;n<a.qs.length?show():fin('Kamu sudah memahami pengertian dan manfaat musyawarah.')},900)}else{e.classList.add('bad','shake');e.onclick=null}})})()},
+sort(a,b){let sel=null,left=a.it.length;b.innerHTML=`<div class="pool"></div><div class="buckets">${a.b.map((t,i)=>`<div class="bk" data-i="${i}"><b>${t}</b></div>`).join('')}</div>`;
+ const pool=b.querySelector('.pool');
+ mix(a.it).forEach(([t,k])=>{const c=document.createElement('button');c.className='chip';c.textContent=t;c.onclick=()=>{b.querySelectorAll('.chip.sel').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');sel={c,k}};pool.appendChild(c)});
+ b.querySelectorAll('.bk').forEach(bk=>bk.onclick=()=>{if(!sel){shk(bk);return}
+  if(sel.k==+bk.dataset.i){const c=sel.c;c.classList.remove('sel');c.onclick=null;bk.appendChild(c);stars++;nav();sel=null;if(!--left)fin('Semua sudah dipilah dengan tepat.')}else{shk(sel.c);shk(bk)}})},
+order(a,b){let n=0;const bx=document.createElement('div');bx.className='cards';b.appendChild(bx);
+ mix(a.it.map((t,i)=>[t,i])).forEach(([t,i])=>{const c=document.createElement('button');c.className='card';c.innerHTML=`<i></i><span>${t}</span>`;
+  c.onclick=()=>{if(c.classList.contains('ok'))return;if(i==n){c.classList.add('ok');c.querySelector('i').textContent=++n;stars++;nav();if(n==a.it.length)fin('Urutan empat langkah bermusyawarah sudah benar.')}else shk(c)};bx.appendChild(c)})},
+sim(a,b){let n=0;b.innerHTML=`<div class="q">${a.sc}</div><div id="ss"></div><div id="dc"></div>`;const ss=$('#ss');
+ a.st.forEach((t,i)=>{const s=document.createElement('button');s.className='step '+(i?'lock':'on');s.innerHTML=`<b>Langkah ${i+1}.</b> ${t}`;
+  s.onclick=()=>{if(i!=n)return;s.className='step fin';s.innerHTML+=' ✓';stars++;nav();n++;if(n<a.st.length){ss.children[n].className='step on'}else decide()};ss.appendChild(s)});
+ function decide(){$('#dc').innerHTML='<div class="q">Apa keputusan kelompok kalian?</div>'+a.op.map((t,i)=>`<button class="o" data-i="${i}">${t}</button>`).join('');
+  $('#dc').querySelectorAll('.o').forEach(e=>e.onclick=()=>{$('#dc').querySelectorAll('.o').forEach(x=>{x.onclick=null;x.style.opacity=.5});e.classList.add('ok');e.style.opacity=1;stars+=2;nav();fin('Keputusan kelompok: <b>'+e.textContent+'</b>. Juru bicara, sampaikan alasan kelompokmu!')})}}
+};
+go(0);
+</script>
+</body>
+</html>
